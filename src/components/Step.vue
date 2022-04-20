@@ -48,10 +48,6 @@ function getInstruColor(trackName: string): string {
       color = '#00d2fe';
       break;
     }
-    default: {
-      color = 'lightgrey';
-      break;
-    }
   }
   return color;
 }
