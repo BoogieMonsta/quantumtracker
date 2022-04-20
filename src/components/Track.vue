@@ -3,18 +3,17 @@
     <Step
         v-for="step in steps"
         :key="step"
-        :instrument="trackName"
-        :color="color"
+        :track-name="name"
+        :step-nb="step"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import Step from "../Step/Step.vue";
+import Step from "./Step.vue";
 
 defineProps({
-  trackName: String,
-  color: String,
+  name: String,
 })
 
 const steps = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
