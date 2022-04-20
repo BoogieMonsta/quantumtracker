@@ -8,6 +8,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@elemaudio/web-renderer-lite": "^1.0.0",
+    "@types/node": "^17.0.25",
     "vue": "^3.2.25"
   },
   "devDependencies": {
