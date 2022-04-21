@@ -3,11 +3,15 @@
 <!--  if track is a ruler, button is assigned class "ruler" -->
   <div class="step-wrapper">
     <button
-        :class="[{ active: isActive }, { ruler: trackName === '#' }]"
+        :class="[
+            { active: isActive },
+            { ruler: trackName === '#' },
+            ]"
         :style="{
           'color': !isActive ? 'rgba(69, 75, 80, 0.5)' : getInstruColor(trackName)
         }"
-        @click="toggleStep(trackName)">{{ trackName !== '#' ? trackName : stepNb }}
+        @click="toggleStep(trackName)">
+      {{ displayTrack(trackName, stepNb) }}
     </button>
     <br>
   </div>
@@ -21,30 +25,43 @@ defineProps({
   stepNb: Number,
 })
 
+const emit = defineEmits(['triggerSample']);
+
 const isActive = ref(false);
 
 function toggleStep(trackName: string) {
   if (trackName !== '#') {
     isActive.value = !isActive.value;
   }
+  if (isActive.value) {
+    triggerSample();
+  }
+}
+
+function triggerSample() {
+  emit('triggerSample');
+}
+
+function displayTrack(trackName: string, stepNb: number) {
+  return trackName === '#' ? stepNb : trackName.toUpperCase()[0];
 }
 
 function getInstruColor(trackName: string): string {
   let color = '';
   switch (trackName) {
-    case 'K': {
+    case 'Kick': {
       color = '#ff3c2f';
       break;
     }
-    case 'S': {
+    case 'Snare': {
       color = '#ffd50a';
       break;
     }
-    case 'H': {
+    case 'Hihat': {
       color = '#30d158';
       break;
     }
-    case 'X': {
+    case 'Xtra': {
       color = '#00d2fe';
       break;
     }
