@@ -1,6 +1,6 @@
 <template>
-<!--  if "isActive" is true, button is assigned class "active" -->
-<!--  if track is a ruler, button is assigned class "ruler" -->
+  <!--  if "isActive" is true, button is assigned class "active" -->
+  <!--  if track is a ruler, button is assigned class "ruler" -->
   <div class="step-wrapper">
     <button
         :class="[
@@ -10,7 +10,7 @@
         :style="{
           'color': !isActive ? 'rgba(69, 75, 80, 0.5)' : getInstruColor(trackName)
         }"
-        @click="toggleStep(trackName, stepNb)">
+        @click="toggleStep(trackName)">
       {{ displayStep(trackName, stepNb) }}
     </button>
     <br>
@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import {ref} from "vue";
 
 defineProps({
   trackName: String,
@@ -29,22 +29,22 @@ const emit = defineEmits(['triggerSample', 'toggleStepInSeq']);
 
 const isActive = ref(false);
 
-function toggleStep(trackName: string, stepNb: number) {
+function toggleStep(trackName: string) {
   if (trackName !== '#') {
     isActive.value = !isActive.value;
   }
   if (isActive.value) {
     triggerSample();
   }
-  toggleStepInSeq(stepNb);
+  toggleStepInSeq();
 }
 
 function triggerSample() {
   emit('triggerSample');
 }
 
-function toggleStepInSeq(stepNb: number) {
-  emit('toggleStepInSeq', stepNb);
+function toggleStepInSeq() {
+  emit('toggleStepInSeq');
 }
 
 function displayStep(trackName: string, stepNb: number) {
@@ -85,7 +85,7 @@ button {
   cursor: pointer;
   line-height: 1.2em;
   color: whitesmoke;
-color: rgba(69, 75, 80, 0.5)
+  color: rgba(69, 75, 80, 0.5)
 }
 
 .active {

@@ -2,7 +2,9 @@
   <div class="title">
     <h1 @click="togglePlay" id="play-btn"><span class="accent">Quick</span>Tracker</h1>
     <div id="slider-container">
+      <label class="bpm-label">{{ tempo }} bpm</label>
       <input type="range" min="1" max="200" v-model="tempo">
+
     </div>
   </div>
   <div class="container">
@@ -11,6 +13,7 @@
         :key="col.id"
         :name="col.name"
         @trigger-sample="triggerSample(col.name)"
+        @update-seq="updateSeq($event, col.name)"
     />
   </div>
 </template>
@@ -46,8 +49,7 @@ const SAMPLE_PATH: Mapping = {
 function getSamplePath(trackName: string): string {
   if (trackName === 'Hihat') {
     return SAMPLE_PATH["HihatC"];
-  }
-  else return SAMPLE_PATH[trackName as Sample];
+  } else return SAMPLE_PATH[trackName as Sample];
 }
 
 // IMPLEMENTING KEYPRESS CAPTURE
@@ -171,8 +173,14 @@ function triggerSample(trackName: string) {
 }
 
 // SEQUENCING
+const core = new WebRenderer();
 const isPlaying = ref(false);
 const tempo = ref(88);
+
+let kickSeq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+let snareSeq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+let hihatSeq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+let xtraSeq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 function togglePlay() {
   isPlaying.value = !isPlaying.value;
@@ -180,6 +188,27 @@ function togglePlay() {
     playSequence();
   } else {
     stopSequence();
+  }
+}
+
+function updateSeq(stepSeq: number[], trackName: string) {
+  switch (trackName) {
+    case 'Kick': {
+      kickSeq = stepSeq;
+      break;
+    }
+    case 'Snare': {
+      snareSeq = stepSeq;
+      break;
+    }
+    case 'Hihat': {
+      hihatSeq = stepSeq;
+      break;
+    }
+    case 'Xtra': {
+      xtraSeq = stepSeq;
+      break;
+    }
   }
 }
 
@@ -193,7 +222,7 @@ function playSequence() {
   let gate = el.train(gateHz);
 
   const ctx = new window.AudioContext();
-  const core = new WebRenderer();
+  // const core = new WebRenderer();
 
   core.on('load', async function () {
 
@@ -207,7 +236,7 @@ function playSequence() {
             el.sample(
                 {path: 'kick.mp3:0'},
                 el.seq(
-                    {seq: [1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1]},
+                    {seq: kickSeq},
                     gate,
                     1),
                 1),
@@ -217,7 +246,7 @@ function playSequence() {
             el.sample(
                 {path: 'kick.mp3:1'},
                 el.seq(
-                    {seq: [1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1]},
+                    {seq: kickSeq},
                     gate,
                     1),
                 1),
@@ -227,7 +256,7 @@ function playSequence() {
             el.sample(
                 {path: 'snare.mp3:0'},
                 el.seq(
-                    {seq: [0, 0, 0, 0, 1, 0, 0, 0]},
+                    {seq: snareSeq},
                     gate,
                     1),
                 1),
@@ -237,7 +266,7 @@ function playSequence() {
             el.sample(
                 {path: 'snare.mp3:1'},
                 el.seq(
-                    {seq: [0, 0, 0, 0, 1, 0, 0, 0]},
+                    {seq: snareSeq},
                     gate,
                     1),
                 1),
@@ -247,7 +276,7 @@ function playSequence() {
             el.sample(
                 {path: 'hhClosed.mp3:0'},
                 el.seq(
-                    {seq: [1]},
+                    {seq: hihatSeq},
                     gate,
                     1),
                 1),
@@ -257,27 +286,27 @@ function playSequence() {
             el.sample(
                 {path: 'hhClosed.mp3:1'},
                 el.seq(
-                    {seq: [1]},
+                    {seq: hihatSeq},
                     gate,
                     1),
                 1),
         ),
-        // CLAP - left channel
+        // XTRA - left channel
         el.mul(0.5,
             el.sample(
                 {path: 'clap.mp3:0'},
                 el.seq(
-                    {seq: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0]},
+                    {seq: xtraSeq},
                     gate,
                     1),
                 1),
         ),
-        // CLAP - right channel
+        // XTRA - right channel
         el.mul(0.5,
             el.sample(
                 {path: 'clap.mp3:1'},
                 el.seq(
-                    {seq: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0]},
+                    {seq: xtraSeq},
                     gate,
                     1),
                 1),
@@ -296,7 +325,7 @@ function playSequence() {
     let sampleBufferS = await ctx.decodeAudioData(await snareSmp.arrayBuffer());
     let sampleBufferHc = await ctx.decodeAudioData(await hhClosedSmp.arrayBuffer());
     let sampleBufferHo = await ctx.decodeAudioData(await hhOpenSmp.arrayBuffer());
-    let sampleBufferC = await ctx.decodeAudioData(await clapSmp.arrayBuffer());
+    let sampleBufferX = await ctx.decodeAudioData(await clapSmp.arrayBuffer());
 
     let node = await core.initialize(ctx, {
       numberOfInputs: 0,
@@ -312,20 +341,18 @@ function playSequence() {
           'hhClosed.mp3:1': sampleBufferHc.getChannelData(1),
           'hhOpen.mp3:0': sampleBufferHo.getChannelData(0),
           'hhOpen.mp3:1': sampleBufferHo.getChannelData(1),
-          'clap.mp3:0': sampleBufferC.getChannelData(0),
-          'clap.mp3:1': sampleBufferC.getChannelData(1),
+          'clap.mp3:0': sampleBufferX.getChannelData(0),
+          'clap.mp3:1': sampleBufferX.getChannelData(1),
         }
       }
     });
-
     node.connect(ctx.destination);
   })();
 }
 
 function stopSequence() {
   console.log('stopped sequence.');
-  console.log('Tempo: ', tempo.value);
-
+  // TODO: make it stop!!
 }
 
 // COLUMNS FOR DISPLAY
@@ -345,6 +372,11 @@ const columns = [
 h1 {
   color: whitesmoke;
   font-size: xxx-large;
+}
+
+.bpm-label {
+  color: white;
+  padding: 10px;
 }
 
 .accent {
