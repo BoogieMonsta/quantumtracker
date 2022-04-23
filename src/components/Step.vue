@@ -10,8 +10,8 @@
         :style="{
           'color': !isActive ? 'rgba(69, 75, 80, 0.5)' : getInstruColor(trackName)
         }"
-        @click="toggleStep(trackName)">
-      {{ displayTrack(trackName, stepNb) }}
+        @click="toggleStep(trackName, stepNb)">
+      {{ displayStep(trackName, stepNb) }}
     </button>
     <br>
   </div>
@@ -25,24 +25,29 @@ defineProps({
   stepNb: Number,
 })
 
-const emit = defineEmits(['triggerSample']);
+const emit = defineEmits(['triggerSample', 'toggleStepInSeq']);
 
 const isActive = ref(false);
 
-function toggleStep(trackName: string) {
+function toggleStep(trackName: string, stepNb: number) {
   if (trackName !== '#') {
     isActive.value = !isActive.value;
   }
   if (isActive.value) {
     triggerSample();
   }
+  toggleStepInSeq(stepNb);
 }
 
 function triggerSample() {
   emit('triggerSample');
 }
 
-function displayTrack(trackName: string, stepNb: number) {
+function toggleStepInSeq(stepNb: number) {
+  emit('toggleStepInSeq', stepNb);
+}
+
+function displayStep(trackName: string, stepNb: number) {
   return trackName === '#' ? stepNb : trackName.toUpperCase()[0];
 }
 

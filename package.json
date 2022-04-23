@@ -1,7 +1,7 @@
 {
   "name": "quicktracker",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
@@ -10,7 +10,8 @@
   "dependencies": {
     "@elemaudio/web-renderer-lite": "^1.0.0",
     "@types/node": "^17.0.25",
-    "vue": "^3.2.25"
+    "vue": "^3.2.25",
+    "vue3-keypress": "^4.0.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.1",
