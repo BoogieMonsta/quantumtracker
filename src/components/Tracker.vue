@@ -1,15 +1,17 @@
 <template>
   <div class="title">
     <h1 @click="togglePlay" id="play-btn"><span class="accent">Quick</span>Tracker</h1>
+    <!-- BPM user input -->
     <div id="slider-container">
-      <label class="bpm-label">{{ tempo }} bpm</label><br>
-      <input id="tempo-text-input" type="range" min="1" max="200" v-model="tempo">
+      <label class="bpm-label">{{ bpm }} bpm</label><br>
+      <input type="range" min="1" max="200" v-model="bpm">
     </div>
+    <!-- code user input (WIP) -->
     <!-- <div class="code-input-container">
       <input id="code-input" type="text" v-if="seqInputIsVisible" placeholder="(3, 11).vol(-4).prob(0.5)">
     </div> -->
   </div>
-  <div class="container">
+  <div class="tracker-container">
     <Track
         v-for="col in columns"
         :key="col.id"
@@ -36,7 +38,7 @@ let ctx: AudioContext | undefined;
 let core = new WebRenderer();
 
 const isPlaying = ref(false);
-const tempo = ref(88);
+const bpm = ref(88);
 const seqInputIsVisible = ref(false);
 
 // SAMPLE FILE PATHS
@@ -176,24 +178,20 @@ function togglePlaybackSequence() {
 
   core.on('load', function() {
 
-    let cycleLength = ref(4 * 60000 / tempo.value);
+    // computing length in ms from BPM: 4 beats * 60,000 ms / BPM
+    let cycleLength = ref(4 * 60000 / bpm.value);
 
     setInterval(async function() {
       if (ctx?.state === 'suspended') {
         await ctx.resume();
       }
-      // computing length in ms from BPM: 4 beats * 60,000 ms / BPM
-      // cycleLength.value = 4 * 60000 / tempo.value;
-
-      console.log('Cycle length (ms): ', cycleLength.value)
 
       // Convert from BPM to hertz for 1/16 note unit value
       // divide by 60 and multiply by 4
-      let gateHz = tempo.value / 15;
-
+      let gateHz = bpm.value / 15;
       let gate = el.train(gateHz);
 
-      const monitoring = isPlaying.value ? 1 : 0;
+      const onOffSwitch = isPlaying.value ? 1 : 0;
 
       let out = el.add(
           // KICK - left channel
@@ -206,7 +204,7 @@ function togglePlaybackSequence() {
                       gate,
                       1),
                   1),
-              monitoring // we multiply by 1 or 0 to hear or mute audio
+              onOffSwitch // we multiply by 1 or 0 to hear or mute the audio
           ),
           // KICK - right channel
           el.mul(
@@ -218,7 +216,7 @@ function togglePlaybackSequence() {
                       gate,
                       1),
                   1),
-              monitoring
+              onOffSwitch
           ),
           // SNARE - left channel
           el.mul(
@@ -230,7 +228,7 @@ function togglePlaybackSequence() {
                       gate,
                       1),
                   1),
-              monitoring
+              onOffSwitch
           ),
           // SNARE - right channel
           el.mul(
@@ -242,7 +240,7 @@ function togglePlaybackSequence() {
                       gate,
                       1),
                   1),
-              monitoring
+              onOffSwitch
           ),
           // HH CLOSED - left channel
           el.mul(
@@ -254,7 +252,7 @@ function togglePlaybackSequence() {
                       gate,
                       1),
                   1),
-              monitoring
+              onOffSwitch
           ),
           // HH CLOSED - right channel
           el.mul(
@@ -266,7 +264,7 @@ function togglePlaybackSequence() {
                       gate,
                       1),
                   1),
-              monitoring
+              onOffSwitch
           ),
           // XTRA - left channel
           el.mul(
@@ -278,7 +276,7 @@ function togglePlaybackSequence() {
                       gate,
                       1),
                   1),
-              monitoring
+              onOffSwitch
           ),
           // XTRA - right channel
           el.mul(
@@ -290,7 +288,7 @@ function togglePlaybackSequence() {
                       gate,
                       1),
                   1),
-              monitoring
+              onOffSwitch
           ),
       );
       core.render(out, out);
@@ -335,7 +333,7 @@ function togglePlaybackSequence() {
 // KEYPRESS CAPTURE
 // TODO: upon keypress, display <input> so user can enter code like
 // (3, 11, 16).vol(-5).nudge(15).prob(0.5)
-  // take the kicks at steps 3, 11 and 16
+  // select the kicks at steps 3, 11 and 16
   // make them quieter
   // make them more laid back in the pocket
   // only play them every other cycle
@@ -380,8 +378,9 @@ useKeypress({
 });
 
 function showSeqInput(trackName: string) {
-  // TODO: make an input appear with focus so user can type sequence like 0000100101001000
-  // or edit sequence with code ([stepNb], [stepNb], ...).somefunction().somefunction()
+  // TODO: make an input appear with focus so user can
+      // type sequence like 0000100101001000
+      // edit sequence with code ([stepNb], [stepNb], ...).somefunction().somefunction()
   seqInputIsVisible.value = true;
 }
 
@@ -401,7 +400,7 @@ const columns = [
 
 h1 {
   color: whitesmoke;
-  font-size: xxx-large;
+  font-size: 2.5em;
 }
 
 .bpm-label {
@@ -416,17 +415,18 @@ h1 {
 #play-btn {
   cursor: pointer;
   font-family: 'Nunito Sans';
-  margin-bottom: 0;
+  margin-bottom: 0.3em;
 }
 
 #code-input {
   font-family: 'Fira Code', monospace;
   color: white;
-  background-color: darkslategray;
+  background-color: black;
+  padding: 50px;
   width: 80%;
 }
 
-.container {
+.tracker-container {
   display: grid;
   grid-template-columns: 100px 50px 50px 50px 50px 100px;
   grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;

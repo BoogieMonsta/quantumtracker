@@ -9,7 +9,10 @@
             { sample: trackName !== '#' },
             ]"
         :style="{
-          'color': !isActive ? 'rgba(69, 75, 80, 0.5)' : getInstruColor(trackName as string)
+          'background': !isActive ? '-webkit-radial-gradient(#4b4b4b, #2f2f2f)'
+ : getInstruColor(trackName as string),
+          '-webkit-background-clip': 'text',
+          '-webkit-text-fill-color': 'transparent',
         }"
         @click="toggleStep(trackName as string)">
       {{ displayStep(trackName as string, stepNb as number) }}
@@ -53,26 +56,26 @@ function displayStep(trackName: string, stepNb: number) {
 }
 
 function getInstruColor(trackName: string): string {
-  let color = '';
+  let color = '-webkit-radial-gradient(';
   switch (trackName) {
     case 'Kick': {
-      color = '#ff3c2f';
+      color += '#ff3c2f';
       break;
     }
     case 'Snare': {
-      color = '#ffd50a';
+      color += '#ffd50a';
       break;
     }
     case 'Hihat': {
-      color = '#30d158';
+      color += '#30d158';
       break;
     }
     case 'Xtra': {
-      color = '#00d2fe';
+      color += '#00d2fe';
       break;
     }
   }
-  return color;
+  return color + ', #2f2f2f)';
 }
 
 </script>
@@ -81,19 +84,21 @@ function getInstruColor(trackName: string): string {
 
 button {
   border: none;
-  background: none;
+  background: -webkit-radial-gradient(#4b4b4b, #2f2f2f);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   font-size: 25pt;
   cursor: pointer;
   line-height: 1.2em;
-  color: rgba(69, 75, 80, 0.5)
+}
+
+.active {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .sample {
   font-family: 'Nexa Rust Sans';
-}
-
-.active {
-  /* font-weight: bolder; */
 }
 
 .ruler {

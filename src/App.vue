@@ -11,15 +11,15 @@ import Tracker from './components/Tracker.vue'
 
 <style>
 
-* {
-  background: black;
-}
-
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   margin-top: 60px;
+}
+
+body {
+  background: radial-gradient(#333333, #1c1c1c);
 }
 </style>
