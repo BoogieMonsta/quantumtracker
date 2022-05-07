@@ -6,12 +6,13 @@
         :class="[
             { active: isActive },
             { ruler: trackName === '#' },
+            { sample: trackName !== '#' },
             ]"
         :style="{
-          'color': !isActive ? 'rgba(69, 75, 80, 0.5)' : getInstruColor(trackName)
+          'color': !isActive ? 'rgba(69, 75, 80, 0.5)' : getInstruColor(trackName as string)
         }"
-        @click="toggleStep(trackName)">
-      {{ displayStep(trackName, stepNb) }}
+        @click="toggleStep(trackName as string)">
+      {{ displayStep(trackName as string, stepNb as number) }}
     </button>
     <br>
   </div>
@@ -84,15 +85,20 @@ button {
   font-size: 25pt;
   cursor: pointer;
   line-height: 1.2em;
-  color: whitesmoke;
   color: rgba(69, 75, 80, 0.5)
 }
 
+.sample {
+  font-family: 'Nexa Rust Sans';
+}
+
 .active {
-  font-weight: bolder;
+  /* font-weight: bolder; */
 }
 
 .ruler {
   cursor: default;
+  font-family: 'Fira Code';
 }
+
 </style>
