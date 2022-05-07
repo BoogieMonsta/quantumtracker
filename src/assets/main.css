@@ -1,0 +1,8 @@
+@font-face {
+    font-family: "Nexa Rust Sans";
+    font-weight: 400;
+    font-style: normal;
+    font-display: auto;
+    unicode-range: U+000-5FF;
+    src: local("Nexa Rust Sans") format("truetype");
+}
