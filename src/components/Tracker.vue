@@ -1,10 +1,10 @@
 <template>
   <div class="title">
     <h1 @click="togglePlay" id="play-btn"><span class="accent">Quick</span>Tracker</h1>
-    <!-- <div id="slider-container">
-      <label class="bpm-label">{{ tempo }} bpm</label>
+    <div id="slider-container">
+      <label class="bpm-label">{{ tempo }} bpm</label><br>
       <input id="tempo-text-input" type="range" min="1" max="200" v-model="tempo">
-    </div> -->
+    </div>
     <!-- <div class="code-input-container">
       <input id="code-input" type="text" v-if="seqInputIsVisible" placeholder="(3, 11).vol(-4).prob(0.5)">
     </div> -->
@@ -191,11 +191,9 @@ function togglePlaybackSequence() {
       // divide by 60 and multiply by 4
       let gateHz = tempo.value / 15;
 
-      // let gate = el.train(gateHz);
-      let gate = 1;
+      let gate = el.train(gateHz);
 
-      const phasor = isPlaying.value ? 1 : 0;
-      // const phasor = el.phasor(1, 1);
+      const monitoring = isPlaying.value ? 1 : 0;
 
       let out = el.add(
           // KICK - left channel
@@ -208,7 +206,7 @@ function togglePlaybackSequence() {
                       gate,
                       1),
                   1),
-              el.le(phasor, 0.5)
+              monitoring // we multiply by 1 or 0 to hear or mute audio
           ),
           // KICK - right channel
           el.mul(
@@ -220,7 +218,7 @@ function togglePlaybackSequence() {
                       gate,
                       1),
                   1),
-              el.le(phasor, 0.5)
+              monitoring
           ),
           // SNARE - left channel
           el.mul(
@@ -232,7 +230,7 @@ function togglePlaybackSequence() {
                       gate,
                       1),
                   1),
-              el.le(phasor, 0.5)
+              monitoring
           ),
           // SNARE - right channel
           el.mul(
@@ -244,7 +242,7 @@ function togglePlaybackSequence() {
                       gate,
                       1),
                   1),
-              el.le(phasor, 0.5)
+              monitoring
           ),
           // HH CLOSED - left channel
           el.mul(
@@ -256,7 +254,7 @@ function togglePlaybackSequence() {
                       gate,
                       1),
                   1),
-              el.le(phasor, 0.5)
+              monitoring
           ),
           // HH CLOSED - right channel
           el.mul(
@@ -268,7 +266,7 @@ function togglePlaybackSequence() {
                       gate,
                       1),
                   1),
-              el.le(phasor, 0.5)
+              monitoring
           ),
           // XTRA - left channel
           el.mul(
@@ -280,7 +278,7 @@ function togglePlaybackSequence() {
                       gate,
                       1),
                   1),
-              el.le(phasor, 0.5)
+              monitoring
           ),
           // XTRA - right channel
           el.mul(
@@ -292,7 +290,7 @@ function togglePlaybackSequence() {
                       gate,
                       1),
                   1),
-              el.le(phasor, 0.5)
+              monitoring
           ),
       );
       core.render(out, out);
@@ -418,6 +416,7 @@ h1 {
 #play-btn {
   cursor: pointer;
   font-family: 'Nunito Sans';
+  margin-bottom: 0;
 }
 
 #code-input {
