@@ -1,6 +1,8 @@
 # QuickTracker
 A keyboard operated tracker sequencer made with [Vue 3](https://vuejs.org/) and [Elementary Audio](https://www.elementary.audio/).
 
+[Click here](https://www.sesameaudio.com/) to demo it live.
+
 <img width="1490" alt="quictracker-screeshot" src="https://user-images.githubusercontent.com/73052877/167270384-802d007f-f146-48c4-9904-9a1c7f3019de.png">
 
 This is a work in progress, most major features are still missing; I'm still ironing out a bunch of bugs.
