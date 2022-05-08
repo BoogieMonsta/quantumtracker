@@ -137,10 +137,10 @@
 	}
 
 	// SEQUENCING
-	let kickSeq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-	let snareSeq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+	let kickSeq =  [1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1];
+	let snareSeq = [0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0];
 	let hihatSeq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-	let xtraSeq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+	let xtraSeq =  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 	function togglePlay() {
 		isPlaying.value = !isPlaying.value;
@@ -197,7 +197,6 @@
 				let out = el.add(
 					// KICK - left channel
 					el.mul(
-						0.5,
 						el.sample(
 							{ path: 'kick.mp3:0' },
 							el.seq({ seq: kickSeq }, gate, 1),
@@ -207,7 +206,6 @@
 					),
 					// KICK - right channel
 					el.mul(
-						0.5,
 						el.sample(
 							{ path: 'kick.mp3:1' },
 							el.seq({ seq: kickSeq }, gate, 1),
@@ -217,7 +215,6 @@
 					),
 					// SNARE - left channel
 					el.mul(
-						0.4,
 						el.sample(
 							{ path: 'snare.mp3:0' },
 							el.seq({ seq: snareSeq }, gate, 1),
@@ -227,7 +224,6 @@
 					),
 					// SNARE - right channel
 					el.mul(
-						0.4,
 						el.sample(
 							{ path: 'snare.mp3:1' },
 							el.seq({ seq: snareSeq }, gate, 1),
@@ -237,7 +233,6 @@
 					),
 					// HH CLOSED - left channel
 					el.mul(
-						0.15,
 						el.sample(
 							{ path: 'hhClosed.mp3:0' },
 							el.seq({ seq: hihatSeq }, gate, 1),
@@ -247,7 +242,6 @@
 					),
 					// HH CLOSED - right channel
 					el.mul(
-						0.15,
 						el.sample(
 							{ path: 'hhClosed.mp3:1' },
 							el.seq({ seq: hihatSeq }, gate, 1),
@@ -257,7 +251,6 @@
 					),
 					// XTRA - left channel
 					el.mul(
-						0.5,
 						el.sample(
 							{ path: 'clap.mp3:0' },
 							el.seq({ seq: xtraSeq }, gate, 1),
@@ -267,7 +260,6 @@
 					),
 					// XTRA - right channel
 					el.mul(
-						0.5,
 						el.sample(
 							{ path: 'clap.mp3:1' },
 							el.seq({ seq: xtraSeq }, gate, 1),
