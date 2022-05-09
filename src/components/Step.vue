@@ -97,7 +97,7 @@
 	}
 
 	.sample {
-		font-family: 'Nexa Rust Sans';
+		font-family: 'Arial Black', Gadget, sans-serif;
 	}
 
 	.ruler {
