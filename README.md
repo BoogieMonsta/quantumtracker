@@ -4,6 +4,7 @@ A keyboard operated tracker sequencer made with [Vue 3](https://vuejs.org/) and 
 You can demo the live version [here](https://www.sesameaudio.com/).
 [![Netlify Status](https://api.netlify.com/api/v1/badges/2d4b5d87-d733-47d9-967a-bec95d5d567b/deploy-status)](https://app.netlify.com/sites/quantumtracker/deploys)
 
+
 <img width="1490" alt="quictracker-screeshot" src="https://user-images.githubusercontent.com/73052877/167270384-802d007f-f146-48c4-9904-9a1c7f3019de.png">
 
 This is a work in progress: most major features are still missing, and I'm still optimizing the audio engine implementation.
