@@ -92,10 +92,6 @@
 		line-height: 1.2em;
 	}
 
-	button:focus {
-		display: none;
-	}
-
 	.active {
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
@@ -103,6 +99,7 @@
 
 	.sample {
 		font-family: 'Arial Black', Gadget, sans-serif;
+		font-display: block;
 	}
 
 	.ruler {

@@ -5,8 +5,8 @@
 		</h1>
 		<!-- BPM user input -->
 		<div id="slider-container">
-			<label class="bpm-label">{{ bpm }} bpm</label><br />
-			<input type="range" min="1" max="200" v-model="bpm" />
+			<label for="bpm" class="bpm-label">{{ bpm }} bpm</label><br />
+			<input id="bpm" type="range" min="1" max="200" v-model="bpm" />
 		</div>
 		<!-- code user input (WIP) -->
 		<!-- <div class="code-input-container">
@@ -175,20 +175,23 @@
 			ctx = new window.AudioContext();
 		}
 
+		if (!isPlaying.value) {
+			const off = el.const({ value: 0 });
+			core.render(off, off);
+		}
+
+		// computing length in ms from BPM: 4 beats * 60,000 ms / BPM
+		let cycleLength = ref((4 * 60000) / bpm.value);
+		console.log('cycle length: ', cycleLength.value);
+		
+
 		core.on('load', function () {
-			// computing length in ms from BPM: 4 beats * 60,000 ms / BPM
-			let cycleLength = ref((4 * 60000) / bpm.value);
-
-			setInterval(async function () {
-				if (ctx?.state === 'suspended') {
-					await ctx.resume();
-				}
-
+			setInterval(function () {
 				let outL = el.add(
 					prepSampleForSeq('kick.mp3:0', kickSeq),
 					prepSampleForSeq('snare.mp3:0', snareSeq),
 					prepSampleForSeq('hhClosed.mp3:0', hihatSeq),
-					prepSampleForSeq('clap.mp3:0', xtraSeq),
+					prepSampleForSeq('clap.mp3:0', xtraSeq)
 				);
 				let outR = el.add(
 					prepSampleForSeq('kick.mp3:1', kickSeq),
@@ -250,6 +253,10 @@
 		const onOffSwitch = isPlaying.value
 			? el.const({ key: 'switch', value: 1 })
 			: el.const({ key: 'switch', value: 0 });
+
+		// const message =
+		// 	onOffSwitch.props.value === 1 ? 'SWITCH: ON' : 'SWITCH: OFF';
+		// console.log(message);
 
 		return el.mul(
 			el.sample(
@@ -335,6 +342,7 @@
 	}
 
 	.bpm-label {
+		font-family: 'Fira Code';
 		color: white;
 		padding: 10px;
 	}
@@ -342,7 +350,7 @@
 	.accent {
 		background: -webkit-radial-gradient(#7b828c, #50545b);
 		-webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+		-webkit-text-fill-color: transparent;
 	}
 
 	#play-btn {
