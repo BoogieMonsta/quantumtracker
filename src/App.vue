@@ -18,6 +18,6 @@
 	}
 
 	body {
-		background: radial-gradient(#333333, #1c1c1c);
+		background: radial-gradient(#23272e, #111315);
 	}
 </style>

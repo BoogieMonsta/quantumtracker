@@ -1,7 +1,7 @@
 <template>
 	<div class="title">
 		<h1 @click="togglePlay" id="play-btn">
-			<span class="accent">Quick</span>Tracker
+			<span class="accent">Quantum</span>Tracker
 		</h1>
 		<!-- BPM user input -->
 		<div id="slider-container">
@@ -43,6 +43,14 @@
 	const bpm = ref(88);
 	const seqInputIsVisible = ref(false);
 
+	const playbackRate = el.const({ value: 1 });
+	const oneShotTrigger = el.const({ value: 1 });
+
+	// Convert from BPM to hertz for 1/16 note unit value
+	// divide by 60 and multiply by 4
+	let gateHz = bpm.value / 15;
+	let gate = el.train(gateHz);
+
 	// SAMPLE FILE PATHS
 	// TODO: refactor this to simplify, useless
 	type Sample = 'Kick' | 'Snare' | 'HihatC' | 'HihatO' | 'Xtra';
@@ -63,8 +71,9 @@
 
 	// SAMPLE TRIGGERING (UPON STEP ACTIVATION)
 	function triggerSample(trackName: string) {
-		const ctxTrig = new AudioContext();
-		const coreTrig = new WebRenderer();
+		if (!ctx) {
+			ctx = new window.AudioContext();
+		}
 
 		if (trackName !== '#') {
 			const samplePath = getSamplePath(trackName);
@@ -73,22 +82,14 @@
 
 			// After we've imported and set up our context, we install a load event listener
 			// so that once the audio backend is ready we can kick off our render
-			coreTrig.on('load', async function () {
-				if (ctxTrig.state === 'suspended') {
-					await ctxTrig.resume();
+			core.on('load', async function () {
+				if (ctx?.state === 'suspended') {
+					await ctx.resume();
 				}
 
-				coreTrig.render(
-					el.sample(
-						{ path: trackLeft },
-						el.const({ value: 1 }), // trigger (1 = one-shot)
-						1 // playback rate
-					),
-					el.sample(
-						{ path: trackRight },
-						el.const({ value: 1 }), // trigger (1 = one-shot)
-						1 // playback rate
-					)
+				core.render(
+					el.sample({ path: trackLeft }, oneShotTrigger, playbackRate),
+					el.sample({ path: trackRight }, oneShotTrigger, playbackRate)
 				);
 			});
 
@@ -100,20 +101,20 @@
 				let snareSmp = await fetch(snare);
 				let hhClosedSmp = await fetch(hhClosed);
 				let clapSmp = await fetch(clap);
-				let sampleBufferK = await ctxTrig.decodeAudioData(
+				let sampleBufferK = await ctx.decodeAudioData(
 					await kickSmp.arrayBuffer()
 				);
-				let sampleBufferS = await ctxTrig.decodeAudioData(
+				let sampleBufferS = await ctx.decodeAudioData(
 					await snareSmp.arrayBuffer()
 				);
-				let sampleBufferH = await ctxTrig.decodeAudioData(
+				let sampleBufferH = await ctx.decodeAudioData(
 					await hhClosedSmp.arrayBuffer()
 				);
-				let sampleBufferC = await ctxTrig.decodeAudioData(
+				let sampleBufferC = await ctx.decodeAudioData(
 					await clapSmp.arrayBuffer()
 				);
 
-				let node = await coreTrig.initialize(ctxTrig, {
+				let node = await core.initialize(ctx, {
 					numberOfInputs: 0,
 					numberOfOutputs: 1,
 					outputChannelCount: [2],
@@ -131,16 +132,16 @@
 					},
 				});
 
-				node.connect(ctxTrig.destination);
+				node.connect(ctx.destination);
 			})();
 		}
 	}
 
 	// SEQUENCING
-	let kickSeq =  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+	let kickSeq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 	let snareSeq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 	let hihatSeq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-	let xtraSeq =  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+	let xtraSeq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 	function togglePlay() {
 		isPlaying.value = !isPlaying.value;
@@ -170,13 +171,9 @@
 	}
 
 	function togglePlaybackSequence() {
-		// when isPlaying, cycleLength must be 4 * (60000 / tempo.value)
-		// when not playing, cycleLength must be 5ms
-
-		if (ctx?.state === 'running') {
-			ctx.close();
+		if (!ctx) {
+			ctx = new window.AudioContext();
 		}
-		ctx = new window.AudioContext();
 
 		core.on('load', function () {
 			// computing length in ms from BPM: 4 beats * 60,000 ms / BPM
@@ -187,88 +184,19 @@
 					await ctx.resume();
 				}
 
-				// Convert from BPM to hertz for 1/16 note unit value
-				// divide by 60 and multiply by 4
-				let gateHz = bpm.value / 15;
-				let gate = el.train(gateHz);
-
-				const onOffSwitch = isPlaying.value ? 1 : 0;
-
-				let out = el.add(
-					// KICK - left channel
-					el.mul(
-						el.sample(
-							{ path: 'kick.mp3:0' },
-							el.seq({ seq: kickSeq }, gate, 1),
-							1
-						),
-						onOffSwitch // we multiply by 1 or 0 to hear or mute the audio
-					),
-					// KICK - right channel
-					el.mul(
-						el.sample(
-							{ path: 'kick.mp3:1' },
-							el.seq({ seq: kickSeq }, gate, 1),
-							1
-						),
-						onOffSwitch
-					),
-					// SNARE - left channel
-					el.mul(
-						el.sample(
-							{ path: 'snare.mp3:0' },
-							el.seq({ seq: snareSeq }, gate, 1),
-							1
-						),
-						onOffSwitch
-					),
-					// SNARE - right channel
-					el.mul(
-						el.sample(
-							{ path: 'snare.mp3:1' },
-							el.seq({ seq: snareSeq }, gate, 1),
-							1
-						),
-						onOffSwitch
-					),
-					// HH CLOSED - left channel
-					el.mul(
-						el.sample(
-							{ path: 'hhClosed.mp3:0' },
-							el.seq({ seq: hihatSeq }, gate, 1),
-							1
-						),
-						onOffSwitch
-					),
-					// HH CLOSED - right channel
-					el.mul(
-						el.sample(
-							{ path: 'hhClosed.mp3:1' },
-							el.seq({ seq: hihatSeq }, gate, 1),
-							1
-						),
-						onOffSwitch
-					),
-					// XTRA - left channel
-					el.mul(
-						el.sample(
-							{ path: 'clap.mp3:0' },
-							el.seq({ seq: xtraSeq }, gate, 1),
-							1
-						),
-						onOffSwitch
-					),
-					// XTRA - right channel
-					el.mul(
-						el.sample(
-							{ path: 'clap.mp3:1' },
-							el.seq({ seq: xtraSeq }, gate, 1),
-							1
-						),
-						onOffSwitch
-					)
+				let outL = el.add(
+					prepSampleForSeq('kick.mp3:0', kickSeq),
+					prepSampleForSeq('snare.mp3:0', snareSeq),
+					prepSampleForSeq('hhClosed.mp3:0', hihatSeq),
+					prepSampleForSeq('clap.mp3:0', xtraSeq),
 				);
-				core.render(out, out);
+				let outR = el.add(
+					prepSampleForSeq('kick.mp3:1', kickSeq),
+					prepSampleForSeq('snare.mp3:1', snareSeq),
+					prepSampleForSeq('hhClosed.mp3:1', hihatSeq),
+					prepSampleForSeq('clap.mp3:1', xtraSeq)
+				);
+				core.render(outL, outR);
 			}, cycleLength.value);
 		});
 
@@ -317,10 +245,26 @@
 		})();
 	}
 
+	function prepSampleForSeq(samplePath: string, sequence: number[]) {
+		// we multiply by 1 or 0 to hear or mute the audio
+		const onOffSwitch = isPlaying.value
+			? el.const({ key: 'switch', value: 1 })
+			: el.const({ key: 'switch', value: 0 });
+
+		return el.mul(
+			el.sample(
+				{ path: samplePath },
+				el.seq({ seq: sequence }, gate, 1),
+				playbackRate
+			),
+			onOffSwitch
+		);
+	}
+
 	// KEYPRESS CAPTURE
 	// TODO: upon keypress, display <input> so user can enter code
 	// ex: (3, 11, 16).vol(-5).nudge(15).prob(0.5)
-  // would mean
+	// would mean
 	// - select the kicks at steps 3, 11 and 16
 	// - make them quieter
 	// - make them more laid back in the pocket
@@ -385,8 +329,9 @@
 
 <style scoped>
 	h1 {
-		color: whitesmoke;
+		color: #b4b4b4;
 		font-size: 2.5em;
+		font-family: 'Nunito Sans';
 	}
 
 	.bpm-label {
@@ -395,12 +340,13 @@
 	}
 
 	.accent {
-		color: gray;
+		background: -webkit-radial-gradient(#7b828c, #50545b);
+		-webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
 	}
 
 	#play-btn {
 		cursor: pointer;
-		font-family: 'Nunito Sans';
 		margin-bottom: 0.3em;
 	}
 

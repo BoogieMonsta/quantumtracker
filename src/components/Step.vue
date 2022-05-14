@@ -1,6 +1,7 @@
 <template>
 	<!--  if "isActive" is true, button is assigned class "active" -->
 	<!--  if track is a ruler, button is assigned class "ruler" -->
+	<!-- if track is a sample, button is assigned class "sample" -->
 	<div class="step-wrapper">
 		<button
 			:class="[
@@ -9,7 +10,7 @@
 				{ sample: trackName !== '#' },
 			]"
 			:style="{
-          'background': !isActive ? '-webkit-radial-gradient(#4b4b4b, #2f2f2f)'
+          'background': !isActive ? '-webkit-radial-gradient(#50545b, #2f2f2f)'
  : getInstruColor(trackName as string),
           '-webkit-background-clip': 'text',
           '-webkit-text-fill-color': 'transparent',
@@ -89,6 +90,10 @@
 		font-size: 25pt;
 		cursor: pointer;
 		line-height: 1.2em;
+	}
+
+	button:focus {
+		display: none;
 	}
 
 	.active {
