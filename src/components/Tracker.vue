@@ -25,24 +25,24 @@
 </template>
 
 <script setup lang="ts">
-import Track from "./Track.vue";
-import { el } from "@elemaudio/core";
-import WebRenderer from "@elemaudio/web-renderer-lite";
-import kick from "../assets/samples/kick.mp3";
-import snare from "../assets/samples/snare.mp3";
-import hhClosed from "../assets/samples/hhClosed.mp3";
-import hhOpen from "../assets/samples/hhOpen.mp3";
-import clap from "../assets/samples/clap.mp3";
-import { ref } from "vue";
-import { useKeypress } from "vue3-keypress";
+import Track from './Track.vue';
+import { el } from '@elemaudio/core';
+import WebRenderer from '@elemaudio/web-renderer-lite';
+import kick from '../assets/samples/kick.mp3';
+import snare from '../assets/samples/snare.mp3';
+import hhClosed from '../assets/samples/hhClosed.mp3';
+import hhOpen from '../assets/samples/hhOpen.mp3';
+import clap from '../assets/samples/clap.mp3';
+import { ref } from 'vue';
+import { useKeypress } from 'vue3-keypress';
 
 const columns = [
-  { id: 0, name: "#" },
-  { id: 1, name: "Kick" },
-  { id: 2, name: "Snare" },
-  { id: 3, name: "Hihat" },
-  { id: 4, name: "Xtra" },
-  { id: 5, name: "#" },
+  { id: 0, name: '#' },
+  { id: 1, name: 'Kick' },
+  { id: 2, name: 'Snare' },
+  { id: 3, name: 'Hihat' },
+  { id: 4, name: 'Xtra' },
+  { id: 5, name: '#' },
 ];
 
 let ctx: AudioContext | undefined;
@@ -61,22 +61,22 @@ let gateHz = bpm.value / 15;
 let gate = el.train(gateHz);
 
 function getSamplePath(trackName: string): string {
-  let smpPath = "";
+  let smpPath = '';
   switch (trackName) {
-    case "Kick": {
-      smpPath = "kick.mp3";
+    case 'Kick': {
+      smpPath = 'kick.mp3';
       break;
     }
-    case "Snare": {
-      smpPath = "snare.mp3";
+    case 'Snare': {
+      smpPath = 'snare.mp3';
       break;
     }
-    case "Hihat": {
-      smpPath = "hhClosed.mp3";
+    case 'Hihat': {
+      smpPath = 'hhClosed.mp3';
       break;
     }
-    case "Xtra": {
-      smpPath = "clap.mp3";
+    case 'Xtra': {
+      smpPath = 'clap.mp3';
       break;
     }
   }
@@ -90,19 +90,19 @@ function triggerSample(trackName: string) {
   }
 
   const samplePath = getSamplePath(trackName);
-  const trackLeft = samplePath + ":0";
-  const trackRight = samplePath + ":1";
+  const trackLeft = samplePath + ':0';
+  const trackRight = samplePath + ':1';
 
   // After we've imported and set up our context, we install a load event listener
   // so that once the audio backend is ready we can kick off our render
-  core.on("load", async function () {
-    if (ctx?.state === "suspended") {
+  core.on('load', async function () {
+    if (ctx?.state === 'suspended') {
       await ctx.resume();
     }
 
     core.render(
       el.sample({ path: trackLeft }, oneShotTrigger, playbackRate),
-      el.sample({ path: trackRight }, oneShotTrigger, playbackRate)
+      el.sample({ path: trackRight }, oneShotTrigger, playbackRate),
     );
   });
 
@@ -118,7 +118,7 @@ function triggerSample(trackName: string) {
     let sampleBufferK = await ctx.decodeAudioData(await kickSmp.arrayBuffer());
     let sampleBufferS = await ctx.decodeAudioData(await snareSmp.arrayBuffer());
     let sampleBufferH = await ctx.decodeAudioData(
-      await hhClosedSmp.arrayBuffer()
+      await hhClosedSmp.arrayBuffer(),
     );
     let sampleBufferC = await ctx.decodeAudioData(await clapSmp.arrayBuffer());
 
@@ -128,14 +128,14 @@ function triggerSample(trackName: string) {
       outputChannelCount: [2],
       processorOptions: {
         virtualFileSystem: {
-          "kick.mp3:0": sampleBufferK.getChannelData(0),
-          "kick.mp3:1": sampleBufferK.getChannelData(1),
-          "snare.mp3:0": sampleBufferS.getChannelData(0),
-          "snare.mp3:1": sampleBufferS.getChannelData(1),
-          "hhClosed.mp3:0": sampleBufferH.getChannelData(0),
-          "hhClosed.mp3:1": sampleBufferH.getChannelData(1),
-          "clap.mp3:0": sampleBufferC.getChannelData(0),
-          "clap.mp3:1": sampleBufferC.getChannelData(1),
+          'kick.mp3:0': sampleBufferK.getChannelData(0),
+          'kick.mp3:1': sampleBufferK.getChannelData(1),
+          'snare.mp3:0': sampleBufferS.getChannelData(0),
+          'snare.mp3:1': sampleBufferS.getChannelData(1),
+          'hhClosed.mp3:0': sampleBufferH.getChannelData(0),
+          'hhClosed.mp3:1': sampleBufferH.getChannelData(1),
+          'clap.mp3:0': sampleBufferC.getChannelData(0),
+          'clap.mp3:1': sampleBufferC.getChannelData(1),
         },
       },
     });
@@ -152,31 +152,31 @@ let xtraSeq = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 function togglePlay() {
   isPlaying.value = !isPlaying.value;
-  console.log(isPlaying.value ? "PLAY button pressed" : "STOP button pressed");
+  console.log(isPlaying.value ? 'PLAY button pressed' : 'STOP button pressed');
   if (isPlaying.value) {
     playSequence();
   } else {
     const off = el.const({ value: 0 });
     core.render(off, off);
-    console.log("Audio stopped.");
+    console.log('Audio stopped.');
   }
 }
 
 function updateSeq(stepSeq: number[], trackName: string) {
   switch (trackName) {
-    case "Kick": {
+    case 'Kick': {
       kickSeq = stepSeq;
       break;
     }
-    case "Snare": {
+    case 'Snare': {
       snareSeq = stepSeq;
       break;
     }
-    case "Hihat": {
+    case 'Hihat': {
       hihatSeq = stepSeq;
       break;
     }
-    case "Xtra": {
+    case 'Xtra': {
       xtraSeq = stepSeq;
       break;
     }
@@ -188,29 +188,28 @@ function playSequence() {
     ctx = new window.AudioContext();
   }
 
-  core.on("load", function () {
+  core.on('load', function () {
     // computing length in ms from BPM: 4 beats * 60,000 ms / BPM
     let cycleLength = ref((4 * 60000) / bpm.value);
 
-    console.log("Playing audio...");
+    console.log('Playing audio...');
 
     setInterval(function () {
       let outL = el.add(
-        prepSampleForSeq("kick.mp3:0", kickSeq),
-        prepSampleForSeq("snare.mp3:0", snareSeq),
-        prepSampleForSeq("hhClosed.mp3:0", hihatSeq),
-        prepSampleForSeq("clap.mp3:0", xtraSeq)
+        prepSampleForSeq('kick.mp3:0', kickSeq),
+        prepSampleForSeq('snare.mp3:0', snareSeq),
+        prepSampleForSeq('hhClosed.mp3:0', hihatSeq),
+        prepSampleForSeq('clap.mp3:0', xtraSeq),
       );
       let outR = el.add(
-        prepSampleForSeq("kick.mp3:1", kickSeq),
-        prepSampleForSeq("snare.mp3:1", snareSeq),
-        prepSampleForSeq("hhClosed.mp3:1", hihatSeq),
-        prepSampleForSeq("clap.mp3:1", xtraSeq)
+        prepSampleForSeq('kick.mp3:1', kickSeq),
+        prepSampleForSeq('snare.mp3:1', snareSeq),
+        prepSampleForSeq('hhClosed.mp3:1', hihatSeq),
+        prepSampleForSeq('clap.mp3:1', xtraSeq),
       );
       core.render(outL, outR);
     }, cycleLength.value);
   });
-
   (async function main() {
     let kickSmp = await fetch(kick);
     let snareSmp = await fetch(snare);
@@ -220,10 +219,10 @@ function playSequence() {
     let sampleBufferK = await ctx.decodeAudioData(await kickSmp.arrayBuffer());
     let sampleBufferS = await ctx.decodeAudioData(await snareSmp.arrayBuffer());
     let sampleBufferHc = await ctx.decodeAudioData(
-      await hhClosedSmp.arrayBuffer()
+      await hhClosedSmp.arrayBuffer(),
     );
     let sampleBufferHo = await ctx.decodeAudioData(
-      await hhOpenSmp.arrayBuffer()
+      await hhOpenSmp.arrayBuffer(),
     );
     let sampleBufferX = await ctx.decodeAudioData(await clapSmp.arrayBuffer());
 
@@ -233,16 +232,16 @@ function playSequence() {
       outputChannelCount: [2],
       processorOptions: {
         virtualFileSystem: {
-          "kick.mp3:0": sampleBufferK.getChannelData(0),
-          "kick.mp3:1": sampleBufferK.getChannelData(1),
-          "snare.mp3:0": sampleBufferS.getChannelData(0),
-          "snare.mp3:1": sampleBufferS.getChannelData(1),
-          "hhClosed.mp3:0": sampleBufferHc.getChannelData(0),
-          "hhClosed.mp3:1": sampleBufferHc.getChannelData(1),
-          "hhOpen.mp3:0": sampleBufferHo.getChannelData(0),
-          "hhOpen.mp3:1": sampleBufferHo.getChannelData(1),
-          "clap.mp3:0": sampleBufferX.getChannelData(0),
-          "clap.mp3:1": sampleBufferX.getChannelData(1),
+          'kick.mp3:0': sampleBufferK.getChannelData(0),
+          'kick.mp3:1': sampleBufferK.getChannelData(1),
+          'snare.mp3:0': sampleBufferS.getChannelData(0),
+          'snare.mp3:1': sampleBufferS.getChannelData(1),
+          'hhClosed.mp3:0': sampleBufferHc.getChannelData(0),
+          'hhClosed.mp3:1': sampleBufferHc.getChannelData(1),
+          'hhOpen.mp3:0': sampleBufferHo.getChannelData(0),
+          'hhOpen.mp3:1': sampleBufferHo.getChannelData(1),
+          'clap.mp3:0': sampleBufferX.getChannelData(0),
+          'clap.mp3:1': sampleBufferX.getChannelData(1),
         },
       },
     });
@@ -260,9 +259,9 @@ function prepSampleForSeq(samplePath: string, sequence: number[]) {
     el.sample(
       { path: samplePath },
       el.seq({ seq: sequence }, gate, 1),
-      playbackRate
+      playbackRate,
     ),
-    onOffSwitch
+    onOffSwitch,
   );
 }
 
@@ -275,34 +274,34 @@ function prepSampleForSeq(samplePath: string, sequence: number[]) {
 // - make them more laid back in the pocket
 // - only play them every other cycle
 useKeypress({
-  keyEvent: "keydown",
+  keyEvent: 'keydown',
   keyBinds: [
     {
       // ctrl + k
       keyCode: 75,
-      modifiers: ["ctrlKey"],
-      success: showSeqInput("kick"),
+      modifiers: ['ctrlKey'],
+      success: showSeqInput('kick'),
       preventDefault: true,
     },
     {
       // ctrl + s
       keyCode: 83,
-      modifiers: ["ctrlKey"],
-      success: showSeqInput("snare"),
+      modifiers: ['ctrlKey'],
+      success: showSeqInput('snare'),
       preventDefault: true,
     },
     {
       // ctrl + h
       keyCode: 72,
-      modifiers: ["ctrlKey"],
-      success: showSeqInput("hihat"),
+      modifiers: ['ctrlKey'],
+      success: showSeqInput('hihat'),
       preventDefault: true,
     },
     {
       // ctrl + x
       keyCode: 88,
-      modifiers: ["ctrlKey"],
-      success: showSeqInput("xtra"),
+      modifiers: ['ctrlKey'],
+      success: showSeqInput('xtra'),
       preventDefault: true,
     },
     {
@@ -326,11 +325,11 @@ function showSeqInput(trackName: string) {
 h1 {
   color: #b4b4b4;
   font-size: 2.5em;
-  font-family: "Nunito Sans";
+  font-family: 'Nunito Sans';
 }
 
 .bpm-label {
-  font-family: "Fira Code";
+  font-family: 'Fira Code';
   color: white;
   padding: 10px;
 }
@@ -347,7 +346,7 @@ h1 {
 }
 
 #code-input {
-  font-family: "Fira Code", monospace;
+  font-family: 'Fira Code', monospace;
   color: white;
   background-color: black;
   padding: 50px;
@@ -369,21 +368,21 @@ h1 {
   margin: auto;
   padding: 20px 110px 0 110px;
   grid-template-areas:
-    ". . . . . ."
-    ". . . . . ."
-    ". . . . . ."
-    ". . . . . ."
-    ". . . . . ."
-    ". . . . . ."
-    ". . . . . ."
-    ". . . . . ."
-    ". . . . . ."
-    ". . . . . ."
-    ". . . . . ."
-    ". . . . . ."
-    ". . . . . ."
-    ". . . . . ."
-    ". . . . . ."
-    ". . . . . .";
+    '. . . . . .'
+    '. . . . . .'
+    '. . . . . .'
+    '. . . . . .'
+    '. . . . . .'
+    '. . . . . .'
+    '. . . . . .'
+    '. . . . . .'
+    '. . . . . .'
+    '. . . . . .'
+    '. . . . . .'
+    '. . . . . .'
+    '. . . . . .'
+    '. . . . . .'
+    '. . . . . .'
+    '. . . . . .';
 }
 </style>

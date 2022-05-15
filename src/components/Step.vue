@@ -24,60 +24,60 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
 defineProps({
   trackName: String,
   stepNb: Number,
-})
+});
 
-const emit = defineEmits(['triggerSample', 'toggleStepInSeq'])
+const emit = defineEmits(['triggerSample', 'toggleStepInSeq']);
 
-const isActive = ref(false)
+const isActive = ref(false);
 
 function toggleStep(trackName: string) {
   if (trackName !== '#') {
-    isActive.value = !isActive.value
+    isActive.value = !isActive.value;
   }
   if (isActive.value) {
-    triggerSample()
+    triggerSample();
   }
-  toggleStepInSeq()
+  toggleStepInSeq();
 }
 
 function triggerSample() {
-  emit('triggerSample')
+  emit('triggerSample');
 }
 
 function toggleStepInSeq() {
-  emit('toggleStepInSeq')
+  emit('toggleStepInSeq');
 }
 
 function displayStep(trackName: string, stepNb: number) {
-  return trackName === '#' ? stepNb : trackName.toUpperCase()[0]
+  return trackName === '#' ? stepNb : trackName.toUpperCase()[0];
 }
 
 function getInstruColor(trackName: string): string {
-  let color = '-webkit-radial-gradient('
+  let color = '-webkit-radial-gradient(';
   switch (trackName) {
     case 'Kick': {
-      color += '#ff3c2f'
-      break
+      color += '#ff3c2f';
+      break;
     }
     case 'Snare': {
-      color += '#ffd50a'
-      break
+      color += '#ffd50a';
+      break;
     }
     case 'Hihat': {
-      color += '#30d158'
-      break
+      color += '#30d158';
+      break;
     }
     case 'Xtra': {
-      color += '#00d2fe'
-      break
+      color += '#00d2fe';
+      break;
     }
   }
-  return color + ', #2f2f2f)'
+  return color + ', #2f2f2f)';
 }
 </script>
 
