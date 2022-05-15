@@ -36,6 +36,15 @@
 	import { ref } from 'vue';
 	import { useKeypress } from 'vue3-keypress';
 
+	const columns = [
+		{ id: 0, name: '#' },
+		{ id: 1, name: 'Kick' },
+		{ id: 2, name: 'Snare' },
+		{ id: 3, name: 'Hihat' },
+		{ id: 4, name: 'Xtra' },
+		{ id: 5, name: '#' },
+	];
+
 	let ctx: AudioContext | undefined;
 	let core = new WebRenderer();
 
@@ -107,6 +116,7 @@
 				let snareSmp = await fetch(snare);
 				let hhClosedSmp = await fetch(hhClosed);
 				let clapSmp = await fetch(clap);
+
 				let sampleBufferK = await ctx.decodeAudioData(
 					await kickSmp.arrayBuffer()
 				);
@@ -337,16 +347,6 @@
 		// edit sequence with code ([stepNb], [stepNb], ...).somefunction().somefunction()
 		seqInputIsVisible.value = true;
 	}
-
-	// COLUMNS FOR DISPLAY
-	const columns = [
-		{ id: 0, name: '#' },
-		{ id: 1, name: 'Kick' },
-		{ id: 2, name: 'Snare' },
-		{ id: 3, name: 'Hihat' },
-		{ id: 4, name: 'Xtra' },
-		{ id: 5, name: '#' },
-	];
 </script>
 
 <style scoped>
