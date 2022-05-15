@@ -27,12 +27,6 @@
 <script setup lang="ts">
 import Track from './Track.vue';
 import { el } from '@elemaudio/core';
-import WebRenderer from '@elemaudio/web-renderer-lite';
-import kick from '../assets/samples/kick.mp3';
-import snare from '../assets/samples/snare.mp3';
-import hhClosed from '../assets/samples/hhClosed.mp3';
-import hhOpen from '../assets/samples/hhOpen.mp3';
-import clap from '../assets/samples/clap.mp3';
 import { ref } from 'vue';
 import { useKeypress } from 'vue3-keypress';
 
@@ -44,9 +38,6 @@ const columns = [
   { id: 4, name: 'Xtra' },
   { id: 5, name: '#' },
 ];
-
-let ctx: AudioContext | undefined;
-let core = new WebRenderer();
 
 const isPlaying = ref(false);
 const bpm = ref(88);
@@ -85,63 +76,15 @@ function getSamplePath(trackName: string): string {
 
 // SAMPLE TRIGGERING (UPON STEP ACTIVATION)
 function triggerSample(trackName: string) {
-  if (!ctx) {
-    ctx = new window.AudioContext();
-  }
-
   const samplePath = getSamplePath(trackName);
   const trackLeft = samplePath + ':0';
   const trackRight = samplePath + ':1';
 
-  // After we've imported and set up our context, we install a load event listener
-  // so that once the audio backend is ready we can kick off our render
-  core.on('load', async function () {
-    if (ctx?.state === 'suspended') {
-      await ctx.resume();
-    }
-
-    core.render(
-      el.sample({ path: trackLeft }, oneShotTrigger, playbackRate),
-      el.sample({ path: trackRight }, oneShotTrigger, playbackRate),
-    );
-  });
-
-  // After installing our load event handler, we initialize the core renderer
-  // which will spin up the audio backend with the web audio context and fire
-  // our load event above when ready.
-  (async function main() {
-    let kickSmp = await fetch(kick);
-    let snareSmp = await fetch(snare);
-    let hhClosedSmp = await fetch(hhClosed);
-    let clapSmp = await fetch(clap);
-
-    let sampleBufferK = await ctx.decodeAudioData(await kickSmp.arrayBuffer());
-    let sampleBufferS = await ctx.decodeAudioData(await snareSmp.arrayBuffer());
-    let sampleBufferH = await ctx.decodeAudioData(
-      await hhClosedSmp.arrayBuffer(),
-    );
-    let sampleBufferC = await ctx.decodeAudioData(await clapSmp.arrayBuffer());
-
-    let node = await core.initialize(ctx, {
-      numberOfInputs: 0,
-      numberOfOutputs: 1,
-      outputChannelCount: [2],
-      processorOptions: {
-        virtualFileSystem: {
-          'kick.mp3:0': sampleBufferK.getChannelData(0),
-          'kick.mp3:1': sampleBufferK.getChannelData(1),
-          'snare.mp3:0': sampleBufferS.getChannelData(0),
-          'snare.mp3:1': sampleBufferS.getChannelData(1),
-          'hhClosed.mp3:0': sampleBufferH.getChannelData(0),
-          'hhClosed.mp3:1': sampleBufferH.getChannelData(1),
-          'clap.mp3:0': sampleBufferC.getChannelData(0),
-          'clap.mp3:1': sampleBufferC.getChannelData(1),
-        },
-      },
-    });
-
-    node.connect(ctx.destination);
-  })();
+  // FIXME: move core.render() elsewhere
+  //   core.render(
+  //     el.sample({ path: trackLeft }, oneShotTrigger, playbackRate),
+  //     el.sample({ path: trackRight }, oneShotTrigger, playbackRate),
+  //   );
 }
 
 // SEQUENCING
@@ -157,7 +100,8 @@ function togglePlay() {
     playSequence();
   } else {
     const off = el.const({ value: 0 });
-    core.render(off, off);
+    // FIXME: move core.render() elsewhere
+    // core.render(off, off);
     console.log('Audio stopped.');
   }
 }
@@ -184,69 +128,27 @@ function updateSeq(stepSeq: number[], trackName: string) {
 }
 
 function playSequence() {
-  if (!ctx) {
-    ctx = new window.AudioContext();
-  }
+  // computing length in ms from BPM: 4 beats * 60,000 ms / BPM
+  let cycleLength = ref((4 * 60000) / bpm.value);
 
-  core.on('load', function () {
-    // computing length in ms from BPM: 4 beats * 60,000 ms / BPM
-    let cycleLength = ref((4 * 60000) / bpm.value);
+  console.log('Playing audio...');
 
-    console.log('Playing audio...');
-
-    setInterval(function () {
-      let outL = el.add(
-        prepSampleForSeq('kick.mp3:0', kickSeq),
-        prepSampleForSeq('snare.mp3:0', snareSeq),
-        prepSampleForSeq('hhClosed.mp3:0', hihatSeq),
-        prepSampleForSeq('clap.mp3:0', xtraSeq),
-      );
-      let outR = el.add(
-        prepSampleForSeq('kick.mp3:1', kickSeq),
-        prepSampleForSeq('snare.mp3:1', snareSeq),
-        prepSampleForSeq('hhClosed.mp3:1', hihatSeq),
-        prepSampleForSeq('clap.mp3:1', xtraSeq),
-      );
-      core.render(outL, outR);
-    }, cycleLength.value);
-  });
-  (async function main() {
-    let kickSmp = await fetch(kick);
-    let snareSmp = await fetch(snare);
-    let hhClosedSmp = await fetch(hhClosed);
-    let hhOpenSmp = await fetch(hhOpen);
-    let clapSmp = await fetch(clap);
-    let sampleBufferK = await ctx.decodeAudioData(await kickSmp.arrayBuffer());
-    let sampleBufferS = await ctx.decodeAudioData(await snareSmp.arrayBuffer());
-    let sampleBufferHc = await ctx.decodeAudioData(
-      await hhClosedSmp.arrayBuffer(),
+  setInterval(function () {
+    let outL = el.add(
+      prepSampleForSeq('kick.mp3:0', kickSeq),
+      prepSampleForSeq('snare.mp3:0', snareSeq),
+      prepSampleForSeq('hhClosed.mp3:0', hihatSeq),
+      prepSampleForSeq('clap.mp3:0', xtraSeq),
     );
-    let sampleBufferHo = await ctx.decodeAudioData(
-      await hhOpenSmp.arrayBuffer(),
+    let outR = el.add(
+      prepSampleForSeq('kick.mp3:1', kickSeq),
+      prepSampleForSeq('snare.mp3:1', snareSeq),
+      prepSampleForSeq('hhClosed.mp3:1', hihatSeq),
+      prepSampleForSeq('clap.mp3:1', xtraSeq),
     );
-    let sampleBufferX = await ctx.decodeAudioData(await clapSmp.arrayBuffer());
-
-    let node = await core.initialize(ctx, {
-      numberOfInputs: 0,
-      numberOfOutputs: 1,
-      outputChannelCount: [2],
-      processorOptions: {
-        virtualFileSystem: {
-          'kick.mp3:0': sampleBufferK.getChannelData(0),
-          'kick.mp3:1': sampleBufferK.getChannelData(1),
-          'snare.mp3:0': sampleBufferS.getChannelData(0),
-          'snare.mp3:1': sampleBufferS.getChannelData(1),
-          'hhClosed.mp3:0': sampleBufferHc.getChannelData(0),
-          'hhClosed.mp3:1': sampleBufferHc.getChannelData(1),
-          'hhOpen.mp3:0': sampleBufferHo.getChannelData(0),
-          'hhOpen.mp3:1': sampleBufferHo.getChannelData(1),
-          'clap.mp3:0': sampleBufferX.getChannelData(0),
-          'clap.mp3:1': sampleBufferX.getChannelData(1),
-        },
-      },
-    });
-    node.connect(ctx.destination);
-  })();
+    // FIXME: move core.render() elsewhere
+    // core.render(outL, outR);
+  }, cycleLength.value);
 }
 
 function prepSampleForSeq(samplePath: string, sequence: number[]) {
