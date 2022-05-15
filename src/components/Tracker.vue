@@ -4,10 +4,10 @@
 			<span class="accent">Quantum</span>Tracker
 		</h1>
 		<!-- BPM user input -->
-		<div id="slider-container">
+		<!-- <div id="slider-container">
 			<label for="bpm" class="bpm-label">{{ bpm }} bpm</label><br />
 			<input id="bpm" type="range" min="1" max="200" v-model="bpm" />
-		</div>
+		</div> -->
 		<!-- code user input (WIP) -->
 		<!-- <div class="code-input-container">
       <input id="code-input" type="text" v-if="seqInputIsVisible" placeholder="(3, 11).vol(-4).prob(0.5)">
