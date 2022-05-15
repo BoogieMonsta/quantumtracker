@@ -86,6 +86,7 @@ button {
   border: none;
   background: -webkit-radial-gradient(#4b4b4b, #2f2f2f);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   font-size: 25pt;
   cursor: pointer;
@@ -94,6 +95,7 @@ button {
 
 .active {
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

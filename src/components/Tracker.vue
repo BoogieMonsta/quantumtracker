@@ -337,6 +337,7 @@ h1 {
 .accent {
   background: -webkit-radial-gradient(#7b828c, #50545b);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
