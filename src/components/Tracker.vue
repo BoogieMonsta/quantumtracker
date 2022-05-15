@@ -145,8 +145,15 @@
 
 	function togglePlay() {
 		isPlaying.value = !isPlaying.value;
-		console.log(isPlaying.value ? 'PLAY' : 'STOP');
-		togglePlaybackSequence();
+		console.log(isPlaying.value ? 'PLAY button pressed' : 'STOP button pressed');
+		if (isPlaying.value) {
+			playSequence();
+		} else {
+			const off = el.const({ value: 0 });
+			core.render(off, off);
+			console.log('Audio stopped.');
+			
+		}
 	}
 
 	function updateSeq(stepSeq: number[], trackName: string) {
@@ -170,22 +177,17 @@
 		}
 	}
 
-	function togglePlaybackSequence() {
+	function playSequence() {
 		if (!ctx) {
 			ctx = new window.AudioContext();
 		}
 
-		if (!isPlaying.value) {
-			const off = el.const({ value: 0 });
-			core.render(off, off);
-		}
-
-		// computing length in ms from BPM: 4 beats * 60,000 ms / BPM
-		let cycleLength = ref((4 * 60000) / bpm.value);
-		console.log('cycle length: ', cycleLength.value);
-		
-
 		core.on('load', function () {
+			// computing length in ms from BPM: 4 beats * 60,000 ms / BPM
+			let cycleLength = ref((4 * 60000) / bpm.value);
+
+			console.log('Playing audio...');
+
 			setInterval(function () {
 				let outL = el.add(
 					prepSampleForSeq('kick.mp3:0', kickSeq),
@@ -251,8 +253,8 @@
 	function prepSampleForSeq(samplePath: string, sequence: number[]) {
 		// we multiply by 1 or 0 to hear or mute the audio
 		const onOffSwitch = isPlaying.value
-			? el.const({ key: 'switch', value: 1 })
-			: el.const({ key: 'switch', value: 0 });
+			? el.const({ value: 1 })
+			: el.const({ value: 0 });
 
 		// const message =
 		// 	onOffSwitch.props.value === 1 ? 'SWITCH: ON' : 'SWITCH: OFF';
@@ -266,6 +268,12 @@
 			),
 			onOffSwitch
 		);
+
+		// return el.sample(
+		// 	{ path: samplePath },
+		// 	el.seq({ seq: sequence }, gate, 1),
+		// 	playbackRate
+		// );
 	}
 
 	// KEYPRESS CAPTURE
