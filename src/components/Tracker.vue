@@ -51,22 +51,27 @@
 	let gateHz = bpm.value / 15;
 	let gate = el.train(gateHz);
 
-	// SAMPLE FILE PATHS
-	// TODO: refactor this to simplify, useless
-	type Sample = 'Kick' | 'Snare' | 'HihatC' | 'HihatO' | 'Xtra';
-	type Mapping = Record<Sample, string>;
-	const SAMPLE_PATH: Mapping = {
-		Kick: 'kick.mp3',
-		Snare: 'snare.mp3',
-		HihatC: 'hhClosed.mp3',
-		HihatO: 'hhOpen.mp3',
-		Xtra: 'clap.mp3',
-	};
-
 	function getSamplePath(trackName: string): string {
-		if (trackName === 'Hihat') {
-			return SAMPLE_PATH['HihatC'];
-		} else return SAMPLE_PATH[trackName as Sample];
+		let smpPath = '';
+		switch (trackName) {
+			case 'Kick': {
+				smpPath = 'kick.mp3';
+				break;
+			}
+			case 'Snare': {
+				smpPath = 'snare.mp3';
+				break;
+			}
+			case 'Hihat': {
+				smpPath = 'hhClosed.mp3';
+				break;
+			}
+			case 'Xtra': {
+				smpPath = 'clap.mp3';
+				break;
+			}
+		}
+		return smpPath;
 	}
 
 	// SAMPLE TRIGGERING (UPON STEP ACTIVATION)
@@ -96,6 +101,7 @@
 			// After installing our load event handler, we initialize the core renderer
 			// which will spin up the audio backend with the web audio context and fire
 			// our load event above when ready.
+
 			(async function main() {
 				let kickSmp = await fetch(kick);
 				let snareSmp = await fetch(snare);
@@ -145,14 +151,15 @@
 
 	function togglePlay() {
 		isPlaying.value = !isPlaying.value;
-		console.log(isPlaying.value ? 'PLAY button pressed' : 'STOP button pressed');
+		console.log(
+			isPlaying.value ? 'PLAY button pressed' : 'STOP button pressed'
+		);
 		if (isPlaying.value) {
 			playSequence();
 		} else {
 			const off = el.const({ value: 0 });
 			core.render(off, off);
 			console.log('Audio stopped.');
-			
 		}
 	}
 
