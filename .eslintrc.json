@@ -9,9 +9,10 @@
     "plugin:@typescript-eslint/recommended",
     "prettier"
   ],
+  "parser": "vue-eslint-parser",
   "parserOptions": {
     "ecmaVersion": "latest",
-    "parser": "vue-eslint-parser",
+    "parser": "@typescript-eslint/parser",
     "sourceType": "module"
   },
   "plugins": ["vue", "@typescript-eslint"],

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-import Tracker from './components/Tracker.vue';
 import WebRenderer from '@elemaudio/web-renderer-lite';
 import kick from './assets/samples/kick.mp3';
 import snare from './assets/samples/snare.mp3';
 import hhClosed from './assets/samples/hhClosed.mp3';
 import hhOpen from './assets/samples/hhOpen.mp3';
 import clap from './assets/samples/clap.mp3';
+import TrackerComponent from './components/tracker-component.vue';
 
 let core = new WebRenderer();
 const ctx = new window.AudioContext();
@@ -59,8 +59,10 @@ core.on('load', async () => {
 </script>
 
 <template>
-  <button id="clickMe">Start</button>
-  <Tracker />
+  <div>
+    <button id="clickMe">Start</button>
+    <TrackerComponent />
+  </div>
 </template>
 
 <style>

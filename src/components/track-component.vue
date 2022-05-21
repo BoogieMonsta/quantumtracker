@@ -1,6 +1,6 @@
 <template>
   <div class="track-wrapper">
-    <Step
+    <StepComponent
       v-for="step in stepsForDisplay"
       :key="step"
       :track-name="name"
@@ -12,7 +12,6 @@
 </template>
 
 <script setup lang="ts">
-import Step from './Step.vue';
 
 defineProps({ name: String });
 

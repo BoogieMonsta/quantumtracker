@@ -1,31 +1,32 @@
 <template>
-  <div class="title">
-    <h1 @click="togglePlay" id="play-btn">
-      <span class="accent">Quantum</span>Tracker
-    </h1>
-    <!-- BPM user input -->
-    <!-- <div id="slider-container">
-			<label for="bpm" class="bpm-label">{{ bpm }} bpm</label><br />
+  <div>
+    <div class="title">
+      <h1 @click="togglePlay" id="play-btn">
+        <span class="accent">Quantum</span>Tracker
+      </h1>
+      <!-- BPM user input -->
+      <!-- <div id="slider-container">
+      <label for="bpm" class="bpm-label">{{ bpm }} bpm</label><br />
 			<input id="bpm" type="range" min="1" max="200" v-model="bpm" />
 		</div> -->
-    <!-- code user input (WIP) -->
-    <!-- <div class="code-input-container">
+      <!-- code user input (WIP) -->
+      <!-- <div class="code-input-container">
       <input id="code-input" type="text" v-if="seqInputIsVisible" placeholder="(3, 11).vol(-4).prob(0.5)">
     </div> -->
-  </div>
-  <div class="tracker-container">
-    <Track
-      v-for="col in columns"
-      :key="col.id"
-      :name="col.name"
-      @trigger-sample="triggerSample(col.name)"
-      @update-seq="updateSeq($event, col.name)"
-    />
+    </div>
+    <div class="tracker-container">
+      <TrackComponent
+        v-for="col in columns"
+        :key="col.id"
+        :name="col.name"
+        @trigger-sample="triggerSample(col.name)"
+        @update-seq="updateSeq($event, col.name)"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Track from './Track.vue';
 import { el } from '@elemaudio/core';
 import { ref } from 'vue';
 import { useKeypress } from 'vue3-keypress';
